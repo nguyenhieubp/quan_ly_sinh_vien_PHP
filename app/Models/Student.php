@@ -2,21 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Student extends Model
+class Student extends Authenticatable
 {
+    use HasFactory, Notifiable;
+
     protected $fillable = [
-        'classroom_id', // Now nullable via migration
-        'name', 
-        'email', 
-        'student_code'
+        'student_code',
+        'name',
+        'email',
+        'phone',
+        'address',
+        'classroom_id',
+        'password',
     ];
 
-    public function getFullNameAttribute()
-    {
-        return $this->name;
-    }
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     public function classroom()
     {

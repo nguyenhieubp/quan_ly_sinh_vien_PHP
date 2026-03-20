@@ -540,16 +540,15 @@
                 </a>
             </div>
 
-            <div class="nav-section">
-                <span class="nav-section-label">Hệ thống</span>
-                <a href="#" class="nav-item">
-                    <i data-lucide="megaphone"></i>
-                    Thông báo
-                </a>
-                <a href="#" class="nav-item">
-                    <i data-lucide="settings"></i>
-                    Cấu hình
-                </a>
+
+            <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                    @csrf
+                    <button type="submit" class="nav-item" style="width: 100%; border: none; background: rgba(239, 68, 68, 0.1); color: #f87171; cursor: pointer; text-align: left;">
+                        <i data-lucide="log-out"></i>
+                        <span>Đăng xuất</span>
+                    </button>
+                </form>
             </div>
         </nav>
 
@@ -563,8 +562,8 @@
                     <span style="position:absolute; top:-5px; right:-5px; width:8px; height:8px; background:#ef4444; border-radius:50%; border:2px solid white"></span>
                 </div>
                 <div class="profile-chip">
-                    <div class="avatar">AD</div>
-                    <span style="font-size: 0.9rem; font-weight: 600;">Administrator</span>
+                    <div class="avatar">{{ strtoupper(substr(Auth::user()->name ?? 'AD', 0, 2)) }}</div>
+                    <span style="font-size: 0.9rem; font-weight: 600;">{{ Auth::user()->name ?? 'Administrator' }}</span>
                     <i data-lucide="chevron-down" style="width: 14px; color: #64748b"></i>
                 </div>
             </div>
@@ -594,8 +593,17 @@
             <i data-lucide="x" id="close-chat" style="cursor: pointer; width: 18px;"></i>
         </div>
         <div class="chat-messages" id="chat-msgs">
-            <div class="msg bot">Chào bạn! Tôi là EduAgent. Tôi có thể giúp bạn tra cứu thông tin đào tạo.</div>
+            <div class="msg bot">Chào bạn! Tôi là **EduAgent**. Tôi có thể giúp bạn tra cứu điểm số, lịch học, chuyên cần và nhiều thông tin khác.</div>
         </div>
+        
+        <!-- Quick Actions -->
+        <div id="quick-actions" style="padding: 0.5rem 1rem; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; border-top: 1px solid #f1f5f9; background: #fff;">
+            <div class="action-chip" onclick="quickAsk('Lịch học hôm nay')">📅 Lịch học</div>
+            <div class="action-chip" onclick="quickAsk('Hệ thống có bao nhiêu sinh viên?')">📊 Thống kê</div>
+            <div class="action-chip" onclick="quickAsk('Danh sách các khoa')">🏢 Các khoa</div>
+            <div class="action-chip" onclick="quickAsk('Ai là sinh viên xuất sắc nhất?')">🏆 Top SV</div>
+        </div>
+
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Gửi câu hỏi của bạn...">
             <button id="chat-send" style="background: var(--brand-primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
@@ -626,15 +634,25 @@
             bubble.style.display = 'flex';
         };
 
-        async function postMessage() {
-            const val = chatInput.value.trim();
+        async function postMessage(messageOverride = null) {
+            const val = messageOverride || chatInput.value.trim();
             if(!val) return;
 
+            // Clear input
+            if (!messageOverride) chatInput.value = '';
+
+            // User Message
             const userMsg = document.createElement('div');
             userMsg.className = 'msg user';
             userMsg.textContent = val;
             chatMsgs.appendChild(userMsg);
-            chatInput.value = '';
+            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+            // Typing Indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'msg bot typing';
+            typingIndicator.innerHTML = '<span class="typing-dots">Đang xử lý...</span>';
+            chatMsgs.appendChild(typingIndicator);
             chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
             try {
@@ -645,6 +663,9 @@
                 });
                 const data = await res.json();
                 
+                // Remove typing indicator
+                typingIndicator.remove();
+
                 const botMsg = document.createElement('div');
                 botMsg.className = 'msg bot';
                 
@@ -655,9 +676,15 @@
                 botMsg.innerHTML = reply;
                 chatMsgs.appendChild(botMsg);
                 chatMsgs.scrollTop = chatMsgs.scrollHeight;
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error(e); 
+                typingIndicator.innerHTML = '⚠️ Có lỗi xảy ra, vui lòng thử lại.';
+            }
         }
 
+        function quickAsk(msg) {
+            postMessage(msg);
+        }
         sendBtn.onclick = postMessage;
         chatInput.onkeydown = (e) => { if(e.key === 'Enter') postMessage(); };
         // Search Filter Logic

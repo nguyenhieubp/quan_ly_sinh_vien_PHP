@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Semester extends Model
 {
-    protected $fillable = ['name', 'is_active', 'start_date'];
+    protected $fillable = ['name', 'is_active', 'start_date', 'academic_year_id'];
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
 }

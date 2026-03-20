@@ -44,15 +44,10 @@
                         </select>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div>
-                            <label style="display: block; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Học kỳ</label>
-                            <select name="semester_id" class="refined-select" required>
-                                @foreach($semesters as $sem)
-                                    <option value="{{ $sem->id }}" {{ $sem->is_active ? 'selected' : '' }}>{{ $sem->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    @php $activeSemester = $semesters->where('is_active', true)->first(); @endphp
+                    <input type="hidden" name="semester_id" value="{{ $activeSemester ? $activeSemester->id : '' }}">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
                         <div>
                             <label style="display: block; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Năm học</label>
                             <select name="academic_year_id" class="refined-select" required>
@@ -62,23 +57,9 @@
                             </select>
                         </div>
                     </div>
-
                     <div>
                         <label style="display: block; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Tổng số tiết học</label>
                         <input type="number" name="total_periods" id="total_periods" class="refined-input" value="45" required>
-                    </div>
-
-                    <!-- Row: Preview -->
-                    <div style="padding: 1.25rem; background: var(--bg-main); border-radius: 12px; border: 1px solid var(--border-color);">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Lộ trình dự kiến</span>
-                            <button type="button" onclick="updatePreview()" id="preview-btn" style="background: white; border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; color: var(--text-main); transition: all 0.2s;">
-                                Cập nhật
-                            </button>
-                        </div>
-                        <div id="preview-content" style="max-height: 200px; overflow-y: auto; font-size: 11px; color: var(--text-muted);">
-                            <p style="margin: 0; font-style: italic; font-size: 11px; text-align: center; padding: 1rem 0;">Vui lòng thiết lập buổi học...</p>
-                        </div>
                     </div>
                 </div>
 
@@ -201,7 +182,7 @@
                 <div style="display: grid; grid-template-columns: 160px 1fr; gap: 1.25rem; margin-bottom: 1rem;">
                     <div>
                         <label style="display: block; font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Thứ trong tuần</label>
-                        <select name="sessions[${id}][day_of_week]" class="refined-select session-day" style="padding: 0.6rem 1rem;" onchange="updatePreview()">
+                        <select name="sessions[${id}][day_of_week]" class="refined-select session-day" style="padding: 0.6rem 1rem;">
                             <option value="1">Thứ 2</option>
                             <option value="2">Thứ 3</option>
                             <option value="3">Thứ 4</option>
@@ -220,9 +201,9 @@
                     <div>
                         <label style="display: block; font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Tiết học (Từ - Đến)</label>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <input type="number" name="sessions[${id}][start_period]" class="refined-input session-start" placeholder="BĐ" required style="padding: 0.6rem; text-align: center;" onchange="updatePreview()">
+                            <input type="number" name="sessions[${id}][start_period]" class="refined-input session-start" placeholder="BĐ" required style="padding: 0.6rem; text-align: center;">
                             <span style="color: var(--text-muted); font-weight: 700;">-</span>
-                            <input type="number" name="sessions[${id}][end_period]" class="refined-input session-end" placeholder="KT" required style="padding: 0.6rem; text-align: center;" onchange="updatePreview()">
+                            <input type="number" name="sessions[${id}][end_period]" class="refined-input session-end" placeholder="KT" required style="padding: 0.6rem; text-align: center;">
                         </div>
                     </div>
                     <div>
@@ -249,74 +230,6 @@
     function removeSessionSlot(id) {
         const slot = document.getElementById(`session-slot-${id}`);
         slot.remove();
-        updatePreview();
-    }
-
-    async function updatePreview() {
-        const btn = document.getElementById('preview-btn');
-        const content = document.getElementById('preview-content');
-        const form = document.getElementById('assign-form');
-        
-        const semester_id = form.querySelector('select[name="semester_id"]').value;
-        const total_periods = document.getElementById('total_periods').value;
-        
-        const sessionSlots = [];
-        const slots = document.querySelectorAll('[id^="session-slot-"]');
-        
-        slots.forEach(slot => {
-            const day = slot.querySelector('.session-day').value;
-            const start = slot.querySelector('.session-start').value;
-            const end = slot.querySelector('.session-end').value;
-            
-            if (day && start && end) {
-                sessionSlots.push({ day_of_week: day, start_period: start, end_period: end });
-            }
-        });
-
-        if (!semester_id || !total_periods || sessionSlots.length === 0) {
-            content.innerHTML = '<p style="color: #64748b; margin:0; font-style: italic; font-size: 11px; text-align: center; padding: 1rem 0;">Vui lòng thiết lập buổi học...</p>';
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = '...';
-
-        try {
-            let query = `/classrooms/preview-schedule?semester_id=${semester_id}&total_periods=${total_periods}`;
-            sessionSlots.forEach((s, i) => {
-                query += `&sessions[${i}][day_of_week]=${s.day_of_week}&sessions[${i}][start_period]=${s.start_period}&sessions[${i}][end_period]=${s.end_period}`;
-            });
-
-            const response = await fetch(query);
-            const data = await response.json();
-
-            if (data.error) {
-                content.innerHTML = `<p style="color: #ef4444; margin:0; font-size: 11px; padding: 0.5rem; text-align: center;">${data.error}</p>`;
-            } else {
-                let html = `<div style="display: grid; gap: 6px;">`;
-                html += `<div style="padding: 10px; background: #f0fdf4; border-radius: 10px; border: 1px solid #dcfce7; margin-bottom: 8px;">
-                            <p style="margin:0; font-weight: 600; color: #166534; display: flex; justify-content: space-between; font-size: 11px;">
-                                <span>Tổng cộng:</span> <span>${data.totalSessions} buổi học</span>
-                            </p>
-                         </div>`;
-                
-                data.sessions.forEach(s => {
-                    html += `
-                        <div style="display: flex; justify-content: space-between; padding: 6px 10px; background: white; border-radius: 8px; border: 1px solid var(--border-color); animation: slideIn 0.2s ease-out;">
-                            <span style="font-size: 11px; font-weight: 500;">B.${s.index}: <strong style="font-weight: 600;">${s.date}</strong></span>
-                            <span style="color: var(--text-muted); font-size: 10px;">${s.day} (T.${s.periods})</span>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-                content.innerHTML = html;
-            }
-        } catch (e) {
-            content.innerHTML = '<p style="color: #ef4444; margin:0; text-align: center; padding: 1rem 0;">Lỗi kết nối.</p>';
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = 'Cập nhật';
-        }
     }
 </script>
 @endsection

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class StudentSeeder extends Seeder
 {
@@ -16,13 +16,15 @@ class StudentSeeder extends Seeder
             'classroom_id' => 1,
             'name' => 'Lê Văn C',
             'email' => 'lvc@example.com',
-            'student_code' => 'SV001'
+            'student_code' => 'SV001',
+            'password' => Hash::make('123456')
         ]);
         \App\Models\Student::create([
             'classroom_id' => 1,
             'name' => 'Phạm Thị D',
             'email' => 'ptd@example.com',
-            'student_code' => 'SV002'
+            'student_code' => 'SV002',
+            'password' => Hash::make('123456')
         ]);
     }
 }

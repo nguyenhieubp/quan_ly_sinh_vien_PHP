@@ -30,4 +30,10 @@ class AttendanceRuleController extends Controller
 
         return redirect()->back()->with('success', 'Cấu hình đã được lưu thành công.');
     }
+
+    public function destroy(AttendanceRule $attendanceRule)
+    {
+        $attendanceRule->delete();
+        return redirect()->back()->with('success', 'Đã xóa cấu hình chuyên cần.');
+    }
 }

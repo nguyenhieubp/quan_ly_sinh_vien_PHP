@@ -42,7 +42,7 @@ class GradeController extends Controller
     {
         $classroom_id = $request->query('classroom_id');
         $subject_id = $request->query('subject_id');
-        $semester_id = $request->query('semester_id');
+        $academic_year_id = $request->query('academic_year_id');
 
         if (!$classroom_id) {
             return redirect()->route('grades.index')->with('error', 'Vui lòng chọn lớp học.');
@@ -57,45 +57,53 @@ class GradeController extends Controller
         }
 
         $classroom = \App\Models\Classroom::findOrFail($classroom_id);
-        $subjects = \App\Models\Subject::all();
-        $semesters = \App\Models\Semester::all();
+        $subject = \App\Models\Subject::findOrFail($subject_id);
+        
+        \App\Models\AcademicYear::getRelevantYears();
+        $academicYears = \App\Models\AcademicYear::orderBy('name', 'asc')->get();
+        $selectedYearId = $academic_year_id ?: ($academicYears->first()->id ?? null);
+        
+        $semesters = $selectedYearId 
+            ? \App\Models\Semester::where('academic_year_id', $selectedYearId)->get() 
+            : collect();
+        
+        $semesterIds = $semesters->pluck('id')->toArray();
 
         $students = collect();
-        $existingGrades = collect();
-        $calculatedAttendanceScores = []; // Format: [student_id => score]
-        $subject = \App\Models\Subject::findOrFail($subject_id);
-        $semester = null;
+        $existingGrades = [];
+        $calculatedAttendanceScores = [];
 
-        if ($semester_id) {
-            $semester = \App\Models\Semester::findOrFail($semester_id);
-            
+        if ($selectedYearId && !empty($semesterIds)) {
             // Find schedule for this context
             $schedule = \App\Models\Schedule::where('classroom_id', $classroom_id)
                 ->where('subject_id', $subject_id)
                 ->first();
 
             if ($schedule) {
-                // Get registered students
-                $students = \App\Models\Student::whereIn('id', function($query) use ($schedule, $semester_id) {
-                    $query->select('student_id')
-                        ->from('course_registrations')
-                        ->where('schedule_id', $schedule->id)
-                        ->where('semester_id', $semester_id);
-                })->get();
+                // Get registered students and their semester
+                $registrations = \App\Models\CourseRegistration::where('schedule_id', $schedule->id)
+                    ->whereIn('semester_id', $semesterIds)
+                    ->with('student', 'semester')
+                    ->get();
+                
+                $students = $registrations->map(function($reg) {
+                    $student = $reg->student;
+                    $student->registration_semester_id = $reg->semester_id;
+                    $student->registration_semester_name = $reg->semester->name;
+                    return $student;
+                });
 
-                $existingGrades = \App\Models\Grade::where('subject_id', $subject_id)
-                    ->where('semester_id', $semester_id)
-                    ->get()
-                    ->keyBy('student_id');
+                $grades = \App\Models\Grade::where('subject_id', $subject_id)
+                    ->whereIn('semester_id', $semesterIds)
+                    ->get();
+                
+                foreach ($grades as $g) {
+                    $existingGrades["{$g->student_id}_{$g->semester_id}"] = $g;
+                }
 
-                // Fetch Attendance Rule
                 $attendanceRule = \App\Models\AttendanceRule::where('credits', $subject->credits)->first()
-                    ?? new \App\Models\AttendanceRule([
-                        'absent_deduction' => 1.0, 
-                        'late_deduction' => 0.5
-                    ]);
+                    ?? new \App\Models\AttendanceRule(['absent_deduction' => 1.0, 'late_deduction' => 0.5]);
 
-                // Calculate current attendance scores
                 foreach ($students as $student) {
                     $absences = \App\Models\Attendance::where('schedule_id', $schedule->id)
                         ->where('student_id', $student->id)
@@ -108,21 +116,28 @@ class GradeController extends Controller
                         ->count();
 
                     $score = 10 - ($absences * $attendanceRule->absent_deduction) - ($lates * $attendanceRule->late_deduction);
-                    $calculatedAttendanceScores[$student->id] = max(0, round($score, 1));
+                    $calculatedAttendanceScores["{$student->id}_{$student->registration_semester_id}"] = max(0, round($score, 1));
                 }
             }
         }
 
-        return view('grades.bulk', compact('classroom', 'subjects', 'semesters', 'subject', 'semester', 'students', 'existingGrades', 'calculatedAttendanceScores'));
+        return view('grades.bulk', compact(
+            'classroom', 
+            'academicYears', 
+            'selectedYearId', 
+            'subject', 
+            'students', 
+            'existingGrades', 
+            'calculatedAttendanceScores'
+        ));
     }
-
     public function storeBulk(Request $request)
     {
         $request->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'semester_id' => 'required|exists:semesters,id',
             'grades' => 'required|array',
             'grades.*.student_id' => 'required|exists:students,id',
+            'grades.*.semester_id' => 'required|exists:semesters,id',
             'grades.*.midterm' => 'nullable|numeric|min:0|max:10',
             'grades.*.final' => 'nullable|numeric|min:0|max:10',
             'grades.*.attendance' => 'nullable|numeric|min:0|max:10',
@@ -140,13 +155,17 @@ class GradeController extends Controller
             elseif ($total >= 5.5) $grade_letter = 'C';
             elseif ($total >= 4.0) $grade_letter = 'D';
 
+            $semester = \App\Models\Semester::find($data['semester_id']);
+            $academic_year_id = $semester ? $semester->academic_year_id : null;
+
             \App\Models\Grade::updateOrCreate(
                 [
                     'student_id' => $data['student_id'], 
                     'subject_id' => $request->subject_id, 
-                    'semester_id' => $request->semester_id
+                    'semester_id' => $data['semester_id']
                 ],
                 [
+                    'academic_year_id' => $academic_year_id,
                     'midterm' => $data['midterm'],
                     'final' => $data['final'],
                     'attendance' => $data['attendance'],

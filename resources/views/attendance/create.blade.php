@@ -1,3 +1,8 @@
+@php 
+    $hasAttendance = $existingAttendance->isNotEmpty();
+    $initialMode = $hasAttendance ? 'view' : 'edit';
+@endphp
+
 @extends('layouts.app')
 
 @section('title', 'Ghi nhận Điểm danh')
@@ -18,7 +23,7 @@
                     @endif
                 </h3>
             </div>
-            <p style="color: var(--text-body); font-size: var(--fs-xs);">Vui lòng chọn Học kỳ và Ngày điểm danh để nhập thông tin chuyên cần. Dữ liệu sẽ được lưu tự động cho buổi học tương ứng.</p>
+            <p style="color: var(--text-body); font-size: var(--fs-xs);">Vui lòng chọn Niên khóa và Ngày điểm danh để nhập thông tin chuyên cần. Hệ thống sẽ tự động xác định học kỳ tương ứng.</p>
         </div>
         <div style="background: #eff6ff; border: 1px solid #dbeafe; padding: 0.4rem 0.75rem; border-radius: 6px; display: flex; align-items: center; gap: 6px;">
             <i data-lucide="book" style="width: 14px; color: var(--brand-primary);"></i>
@@ -33,12 +38,11 @@
             <input type="hidden" name="subject_id" value="{{ $subject->id }}">
             
             <div style="flex: 1;">
-                <label style="display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Học kỳ đào tạo</label>
-                <select name="semester_id" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; color: var(--text-title); {{ !$semester ? 'border-color: var(--brand-primary); background: #f5f7ff;' : '' }}">
-                    <option value="">-- Chọn học kỳ --</option>
-                    @foreach($semesters as $sem)
-                        <option value="{{ $sem->id }}" {{ ($semester && $semester->id == $sem->id) ? 'selected' : '' }}>
-                            {{ $sem->name }}
+                <label style="display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Niên khóa</label>
+                <select name="academic_year_id" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; color: var(--text-title); background: #f5f7ff; border-color: var(--brand-primary);">
+                    @foreach($academicYears as $year)
+                        <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>
+                            Niên khóa {{ $year->name }}
                         </option>
                     @endforeach
                 </select>
@@ -78,14 +82,14 @@
         </form>
     </div>
 
-    @if(!$semester)
+    @if(!$selectedYearId)
         <!-- Empty State Guidance -->
         <div style="padding: 5rem 2rem; text-align: center;">
             <div style="width: 64px; height: 64px; background: #f8fafc; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto; border: 1px solid #e2e8f0;">
                 <i data-lucide="layers" style="width: 32px; color: #cbd5e1;"></i>
             </div>
-            <h4 style="font-size: 1.1rem; font-weight: 800; color: #64748b; margin-bottom: 0.5rem;">Cần bổ sung Học kỳ</h4>
-            <p style="color: #94a3b8; font-size: 0.9rem; max-width: 400px; margin: 0 auto;">Vui lòng chọn **Học kỳ** ở thanh phía trên để lấy danh sách sinh viên tương ứng với môn học này.</p>
+            <h4 style="font-size: 1.1rem; font-weight: 800; color: #64748b; margin-bottom: 0.5rem;">Cần bổ sung Niên khóa</h4>
+            <p style="color: #94a3b8; font-size: 0.9rem; max-width: 400px; margin: 0 auto;">Vui lòng chọn **Niên khóa** ở thanh phía trên để lấy danh sách sinh viên tương ứng với môn học này.</p>
         </div>
     @elseif($students->isEmpty())
         <!-- No Students State -->
@@ -110,8 +114,7 @@
                 </div>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
                     @php 
-                        $hasAttendance = $existingAttendance->isNotEmpty();
-                        $initialMode = $hasAttendance ? 'view' : 'edit';
+                        // Moved to top for global accessibility
                     @endphp
                     
                     @if($hasAttendance)

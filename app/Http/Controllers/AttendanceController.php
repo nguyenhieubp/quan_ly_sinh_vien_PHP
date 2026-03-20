@@ -41,7 +41,7 @@ class AttendanceController extends Controller
     {
         $classroom_id = $request->query('classroom_id');
         $subject_id = $request->query('subject_id');
-        $semester_id = $request->query('semester_id');
+        $academic_year_id = $request->query('academic_year_id');
         $date_str = $request->query('date', Carbon::today()->toDateString());
         $date = Carbon::parse($date_str);
 
@@ -51,18 +51,22 @@ class AttendanceController extends Controller
 
         $classroom = \App\Models\Classroom::findOrFail($classroom_id);
         $subject = \App\Models\Subject::findOrFail($subject_id);
-        $semesters = \App\Models\Semester::all();
         
-        // Default to active semester if not provided
-        if (!$semester_id) {
-            $activeSem = \App\Models\Semester::where('is_active', true)->first();
-            if ($activeSem) {
-                $semester_id = $activeSem->id;
-            }
+        \App\Models\AcademicYear::getRelevantYears();
+        $academicYears = \App\Models\AcademicYear::orderBy('name', 'asc')->get();
+        
+        // Find current/selected academic year
+        $activeSem = \App\Models\Semester::where('is_active', true)->first();
+        $defaultYearId = $activeSem ? $activeSem->academic_year_id : ($academicYears->first()->id ?? null);
+        $selectedYearId = $academic_year_id ?: $defaultYearId;
+        
+        // Find appropriate semester in that year (active if belongs, else first)
+        $semester = null;
+        if ($selectedYearId) {
+            $yearSemesters = \App\Models\Semester::where('academic_year_id', $selectedYearId)->get();
+            $semester = $yearSemesters->where('is_active', true)->first() ?: $yearSemesters->first();
         }
-        
-        $semester = $semester_id ? \App\Models\Semester::find($semester_id) : null;
-
+        $semester_id = $semester ? $semester->id : null;
         $students = collect();
         $existingAttendance = collect();
         $schedule_id = null; // Initialize early to avoid undefined variable error
@@ -133,7 +137,22 @@ class AttendanceController extends Controller
             $attendanceRule = \App\Models\AttendanceRule::where('credits', $subject->credits)->first();
         }
 
-        return view('attendance.create', compact('classroom', 'subject', 'semesters', 'semester', 'date', 'students', 'existingAttendance', 'schedule_id', 'historicalStats', 'currentSessionNumber', 'totalSessions', 'attendanceRule', 'recordedDates'));
+        return view('attendance.create', compact(
+            'classroom', 
+            'subject', 
+            'academicYears', 
+            'selectedYearId', 
+            'semester', 
+            'date', 
+            'students', 
+            'existingAttendance', 
+            'schedule_id', 
+            'historicalStats', 
+            'currentSessionNumber', 
+            'totalSessions', 
+            'attendanceRule', 
+            'recordedDates'
+        ));
     }
 
     public function store(Request $request)

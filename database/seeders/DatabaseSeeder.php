@@ -2,26 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\AcademicYear;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
+        // Ensure academic years are generated first
+        AcademicYear::getRelevantYears();
+
         $this->call([
+            AdminSeeder::class,
+            AcademicSeeder::class,
             DepartmentSeeder::class,
             TeacherSeeder::class,
             ClassroomSeeder::class,
             StudentSeeder::class,
             SubjectSeeder::class,
             ScheduleSeeder::class,
+            CourseRegistrationSeeder::class,
+            GradeSeeder::class,
+            AttendanceRuleSeeder::class,
         ]);
     }
 }

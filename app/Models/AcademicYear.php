@@ -14,17 +14,18 @@ class AcademicYear extends Model
      */
     public static function getRelevantYears()
     {
-        $currentYear = (int)date('Y');
+        $startYear = 2025;
+        $numberOfYears = 8;
         
-        $years = [
-            ($currentYear - 1) . ' - ' . $currentYear,
-            $currentYear . ' - ' . ($currentYear + 1)
-        ];
+        $years = [];
+        for ($i = 0; $i < $numberOfYears; $i++) {
+            $years[] = ($startYear + $i) . ' - ' . ($startYear + $i + 1);
+        }
 
         foreach ($years as $yearName) {
             static::firstOrCreate(['name' => $yearName]);
         }
 
-        return static::orderBy('name', 'desc')->get();
+        return static::orderBy('name', 'asc')->get();
     }
 }
