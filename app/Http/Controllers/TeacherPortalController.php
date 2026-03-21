@@ -28,17 +28,10 @@ class TeacherPortalController extends Controller
             $query->where('academic_year_id', $yearId);
         }
 
-        $activeSchedules = $query->limit(10)->get();
-        
-        $subjectsCountQuery = Schedule::where('teacher_id', $teacher->id);
-        if ($yearId) {
-            $subjectsCountQuery->where('academic_year_id', $yearId);
-        }
-        $subjectsCount = $subjectsCountQuery->distinct('subject_id')->count();
-            
+        $schedules = $query->get();
         $academicYears = \App\Models\AcademicYear::orderBy('name', 'desc')->get();
 
-        return view('teacher.dashboard', compact('teacher', 'subjectsCount', 'activeSchedules', 'academicYears'));
+        return view('teacher.dashboard', compact('teacher', 'schedules', 'academicYears'));
     }
 
     public function schedule(Request $request)

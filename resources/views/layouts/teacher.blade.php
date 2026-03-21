@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Cổng Thông Tin Giảng Viên</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --brand-primary: #059669;
             --brand-primary-light: #ecfdf5;
             --brand-gradient: linear-gradient(135deg, #065f46 0%, #059669 100%);
             --sidebar-bg: #064e3b;
-            --sidebar-width: 240px;
-            --content-bg: #fdfdfd;
-            --border-light: #f1f5f9;
+            --sidebar-width: 200px;
+            --content-bg: #f8fafc;
+            --border-light: #e2e8f0;
             --text-title: #0f172a;
             --text-body: #475569;
-            --text-muted: #94a3b8;
+            --text-muted: #64748b;
             --radius-main: 12px;
-            --shadow-subtle: 0 1px 3px rgba(0,0,0,0.02);
+            --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            /* Compact font sizes */
+            --fs-base: 0.9375rem;
+            --fs-sm: 0.8125rem;
+            --fs-xs: 0.75rem;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .sidebar-logo h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-title);
         }
 
         body {
@@ -35,6 +44,7 @@
             color: var(--text-body);
             display: flex;
             min-height: 100vh;
+            font-size: var(--fs-base);
         }
 
         /* Streamlined Sidebar */
@@ -47,75 +57,75 @@
             position: fixed;
             height: 100vh;
             z-index: 1000;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.05);
         }
 
         .sidebar-logo {
-            padding: 2rem 1.5rem;
+            padding: 1.5rem 1.25rem;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .logo-icon {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             background: var(--brand-gradient);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
         .sidebar-nav {
-            padding: 1.5rem 0.75rem;
+            padding: 1rem 0.6rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            color: rgba(236, 253, 245, 0.65);
+            gap: 10px;
+            padding: 0.6rem 0.85rem;
+            color: rgba(236, 253, 245, 0.7);
             text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.88rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.8rem;
             transition: all 0.2s ease;
         }
 
         .nav-item:hover {
             color: white;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.05);
         }
 
         .nav-item.active {
-            background: rgba(255,255,255,0.1);
+            background: var(--brand-primary);
             color: white;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
         }
 
         .nav-item i {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
         }
 
         /* Main Context */
         .page-container {
-            margin-left: 200px;
+            margin-left: var(--sidebar-width);
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .header-bar {
-            height: 70px;
+            height: 65px;
             background: white;
             border-bottom: 1px solid var(--border-light);
             padding: 0 2rem;
@@ -130,56 +140,60 @@
         .profile-section {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 4px 4px 4px 14px;
-            border: 1px solid #f1f5f9;
+            gap: 0.75rem;
+            padding: 0.35rem 0.35rem 0.35rem 1rem;
+            border: 1px solid var(--border-light);
             border-radius: 50px;
-            background: #fbfcfd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .profile-section:hover {
+            background: #f8fafc;
         }
 
         .profile-name {
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-size: 0.8rem;
+            font-weight: 600;
             color: var(--text-title);
         }
 
         .avatar-circle {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             background: var(--brand-gradient);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
+            font-weight: 700;
             font-size: 0.75rem;
         }
 
         .main-content {
-            padding: 1.25rem 1.5rem;
-            max-width: 1400px;
-            margin: 0;
+            padding: 1.5rem 2rem;
             width: 100%;
         }
 
         /* Professional Cards */
         .pro-card {
             background: white;
-            border-radius: 8px;
+            border-radius: var(--radius-main);
             border: 1px solid var(--border-light);
-            padding: 1rem;
+            padding: 1.25rem;
             box-shadow: var(--shadow-subtle);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         /* Buttons */
         .btn-pro {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 0.6rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 0.85rem;
-            border: none;
+            border: 1px solid transparent;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -194,8 +208,9 @@
         }
 
         .btn-green:hover {
-            filter: brightness(1.1);
+            filter: brightness(1.05);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
         }
 
         @media (max-width: 992px) {
