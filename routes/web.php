@@ -13,7 +13,9 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Auth\TeacherLoginController;
 use App\Http\Controllers\StudentPortalController;
+use App\Http\Controllers\TeacherPortalController;
 
 // --- ADMIN AUTH ROUTES ---
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -34,6 +36,28 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::get('/schedule', [StudentPortalController::class, 'schedule'])->name('schedule');
         Route::get('/grades', [StudentPortalController::class, 'grades'])->name('grades');
         Route::get('/support', [StudentPortalController::class, 'support'])->name('support');
+    });
+});
+
+// --- TEACHER PORTAL ---
+Route::prefix('teacher')->name('teacher.')->group(function () {
+    Route::get('/login', [TeacherLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [TeacherLoginController::class, 'login']);
+    Route::post('/logout', [TeacherLoginController::class, 'logout'])->name('logout');
+
+    Route::middleware('auth:teacher')->group(function () {
+        Route::get('/dashboard', [TeacherPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/schedule', [TeacherPortalController::class, 'schedule'])->name('schedule');
+        Route::get('/subjects', [TeacherPortalController::class, 'subjects'])->name('subjects');
+        Route::get('/subjects/{schedule}/students', [TeacherPortalController::class, 'students'])->name('students');
+        Route::get('/attendance/{schedule}', [TeacherPortalController::class, 'attendance'])->name('attendance');
+        Route::post('/attendance/{schedule}/save', [TeacherPortalController::class, 'saveAttendance'])->name('attendance.save');
+        
+        Route::get('/grades/{schedule}', [TeacherPortalController::class, 'grades'])->name('grades');
+        Route::post('/grades/{schedule}/save', [TeacherPortalController::class, 'saveGrades'])->name('grades.save');
+
+        Route::get('/profile', [TeacherPortalController::class, 'profile'])->name('profile');
+        Route::post('/profile', [TeacherPortalController::class, 'updateProfile'])->name('profile.update');
     });
 });
 

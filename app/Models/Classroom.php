@@ -8,6 +8,11 @@ class Classroom extends Model
 {
     protected $fillable = ['department_id', 'name', 'code'];
 
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
     public function department()
     {
         return $this->belongsTo(Department::class);

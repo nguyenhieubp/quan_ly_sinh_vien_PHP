@@ -12,17 +12,23 @@ class TeacherSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Teacher::create([
-            'department_id' => 1,
-            'name' => 'Nguyễn Văn A',
-            'email' => 'nva@example.com',
-            'phone' => '0901234567'
-        ]);
-        \App\Models\Teacher::create([
-            'department_id' => 1,
-            'name' => 'Trần Thị B',
-            'email' => 'ttb@example.com',
-            'phone' => '0907654321'
-        ]);
+        \App\Models\Teacher::updateOrCreate(
+            ['email' => 'nva@example.com'],
+            [
+                'department_id' => 1,
+                'name' => 'Nguyễn Văn A',
+                'phone' => '0901234567',
+                'password' => bcrypt('123456')
+            ]
+        );
+        \App\Models\Teacher::updateOrCreate(
+            ['email' => 'ttb@example.com'],
+            [
+                'department_id' => 1,
+                'name' => 'Trần Thị B',
+                'phone' => '0907654321',
+                'password' => bcrypt('123456')
+            ]
+        );
     }
 }
