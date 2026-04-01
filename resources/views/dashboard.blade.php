@@ -114,65 +114,7 @@
             </div>
         </div>
 
-        <!-- System Analytics (Simulated) -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-            <div class="card" style="padding: 1.5rem;">
-                <h3 style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-title);">Tỉ lệ hoàn thành tín chỉ</h3>
-                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: var(--fs-sm);">
-                            <span>Năm 1</span>
-                            <span style="font-weight: 600;">85%</span>
-                        </div>
-                        <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                            <div style="width: 85%; height: 100%; background: var(--brand-primary);"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: var(--fs-sm);">
-                            <span>Năm 2</span>
-                            <span style="font-weight: 600;">72%</span>
-                        </div>
-                        <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                            <div style="width: 72%; height: 100%; background: #10b981;"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: var(--fs-sm);">
-                            <span>Năm 3</span>
-                            <span style="font-weight: 600;">64%</span>
-                        </div>
-                        <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                            <div style="width: 64%; height: 100%; background: #f59e0b;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="padding: 1.5rem;">
-                <h3 style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-title);">Trạng thái xử lý hồ sơ</h3>
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></div>
-                        <div style="flex: 1; font-size: var(--fs-sm);">Đã duyệt tốt nghiệp</div>
-                        <div style="font-weight: 700;">124</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></div>
-                        <div style="flex: 1; font-size: var(--fs-sm);">Đang chờ xét duyệt</div>
-                        <div style="font-weight: 700;">12</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></div>
-                        <div style="flex: 1; font-size: var(--fs-sm);">Yêu cầu bổ sung</div>
-                        <div style="font-weight: 700;">5</div>
-                    </div>
-                    <div style="margin-top: 1rem;">
-                        <button class="btn btn-outline" style="width: 100%; font-size: var(--fs-xs);">Quản lý hồ sơ</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+ 
     </div>
 
     <!-- Sidebar Col -->

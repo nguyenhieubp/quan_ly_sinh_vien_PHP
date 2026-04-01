@@ -84,9 +84,6 @@
                                 <a href="{{ route('teacher.grades', $s->id) }}" class="btn-pro" style="padding: 5px 10px; font-size: 0.7rem; background: #fff7ed; color: #f97316; border: 1px solid #ffedd5; border-radius: 6px;">
                                     <i data-lucide="award" style="width: 14px;"></i> Nhập điểm
                                 </a>
-                                <a href="{{ route('teacher.attendance.report', $s->id) }}" class="btn-pro" style="padding: 5px 10px; font-size: 0.7rem; background: #eff6ff; color: #3b82f6; border: 1px solid #dbeafe; border-radius: 6px;">
-                                    <i data-lucide="file-text" style="width: 14px;"></i> Báo cáo
-                                </a>
                             @endif
                         </div>
                     </td>

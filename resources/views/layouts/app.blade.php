@@ -51,16 +51,17 @@
             font-size: var(--fs-base);
         }
 
-        /* Custom Scrollbar */
+        /* Subtle Scrollbar System */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px; /* Reduced width */
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: transparent; /* Clean track */
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+            background: #cbd1d8;
+            border-radius: 20px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
@@ -356,117 +357,191 @@
         .badge-success { background: #dcfce7; color: #166534; }
         .badge-info { background: #e0f2fe; color: #075985; }
 
-        /* Chatbot Refined */
+        /* Chatbot Redesign */
         #chat-bubble {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            border-radius: 50% 50% 5px 50%;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 2000;
         }
 
         #chat-bubble:hover {
-            transform: scale(1.05) translateY(-5px);
+            transform: scale(1.1) rotate(5deg);
         }
 
         #chat-window {
             position: fixed;
-            bottom: 110px;
+            bottom: 105px;
             right: 30px;
             width: 380px;
-            height: 550px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            height: 600px;
+            background: rgba(255, 255, 255, 0.85); /* Smooth transparency */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
             overflow: hidden;
             z-index: 2000;
-            border: 1px solid var(--border-color);
-            animation: slideUp 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom right;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8) translateY(40px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .chat-header {
-            background: var(--sidebar-bg);
+            background: rgba(30, 41, 59, 0.95);
             color: white;
-            padding: 1.25rem;
+            padding: 1.25rem 1.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .chat-header h4 { color: white; margin: 0; }
+        .chat-header h4 { 
+            color: white; 
+            margin: 0; 
+            font-size: 0.95rem; 
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         .chat-messages {
             flex: 1;
-            padding: 1.25rem;
+            padding: 1.5rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            background: #f8fafc;
+            gap: 1.25rem;
+            background: rgba(248, 250, 252, 0.5);
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .chat-messages::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+        }
+
+        .msg-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .msg {
-            max-width: 80%;
-            padding: 0.75rem 1rem;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            max-width: 85%;
+            padding: 0.85rem 1.15rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            position: relative;
         }
 
         .msg.bot {
             align-self: flex-start;
             background: white;
             color: var(--text-body);
-            border-bottom-left-radius: 2px;
-            box-shadow: var(--shadow-sm);
+            border-radius: 4px 18px 18px 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #f1f5f9;
+            font-weight: 500;
         }
 
         .msg.user {
             align-self: flex-end;
-            background: var(--brand-primary);
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
             color: white;
-            border-bottom-right-radius: 2px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            border-radius: 18px 18px 4px 18px;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+            font-weight: 600;
         }
 
+        .msg-info {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .user .msg-info { align-self: flex-end; }
+
         .chat-input-area {
-            padding: 1rem;
+            padding: 1.25rem 1.5rem;
             background: white;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             border-top: 1px solid var(--border-color);
+            align-items: center;
         }
 
         .chat-input-area input {
             flex: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
+            padding: 0.85rem 1.25rem;
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
             outline: none;
             background: #f8fafc;
-            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
         .chat-input-area input:focus {
             border-color: var(--brand-primary);
             background: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05);
+        }
+
+        .action-chip {
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid #f1f5f9;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .action-chip:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            background: var(--bg-body);
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -574,40 +649,47 @@
         </main>
     </div>
 
-    <!-- Smart Chat Agent -->
     <div id="chat-bubble">
-        <i data-lucide="bot-message-square"></i>
+        <i data-lucide="message-circle" style="stroke-width: 2.5px;"></i>
     </div>
 
     <div id="chat-window">
         <div class="chat-header">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i data-lucide="bot" style="width: 18px;"></i>
+                <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                    <i data-lucide="sparkles" style="width: 20px; color: #fbbf24;"></i>
                 </div>
                 <div>
-                    <h4 style="font-size: 0.95rem;">EduAgent AI</h4>
-                    <span style="font-size: 0.7rem; opacity: 0.7;">Đang trực tuyến</span>
+                    <h4>EduAgent AI</h4>
+                    <div style="display: flex; align-items: center; margin-top: 2px;">
+                        <span class="status-dot"></span>
+                        <span style="font-size: 0.65rem; opacity: 0.7; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Trợ lý trực tuyến</span>
+                    </div>
                 </div>
             </div>
-            <i data-lucide="x" id="close-chat" style="cursor: pointer; width: 18px;"></i>
+            <div id="close-chat" style="padding: 6px; cursor: pointer; opacity: 0.7; transition: all 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">
+                <i data-lucide="x" style="width: 18px;"></i>
+            </div>
         </div>
         <div class="chat-messages" id="chat-msgs">
-            <div class="msg bot">Chào bạn! Tôi là **EduAgent**. Tôi có thể giúp bạn tra cứu điểm số, lịch học, chuyên cần và nhiều thông tin khác.</div>
+            <div class="msg-wrapper">
+                <div class="msg-info">Hệ thống • Vừa xong</div>
+                <div class="msg bot">Xin chào! 👋 Tôi là **EduAgent AI**. Bạn cần tra cứu thông tin gì về học tập, lịch giảng hay các thủ tục hành chính không?</div>
+            </div>
         </div>
         
         <!-- Quick Actions -->
-        <div id="quick-actions" style="padding: 0.5rem 1rem; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; border-top: 1px solid #f1f5f9; background: #fff;">
-            <div class="action-chip" onclick="quickAsk('Lịch học hôm nay')">📅 Lịch học</div>
-            <div class="action-chip" onclick="quickAsk('Hệ thống có bao nhiêu sinh viên?')">📊 Thống kê</div>
-            <div class="action-chip" onclick="quickAsk('Danh sách các khoa')">🏢 Các khoa</div>
-            <div class="action-chip" onclick="quickAsk('Ai là sinh viên xuất sắc nhất?')">🏆 Top SV</div>
+        <div id="quick-actions" style="padding: 1rem 1.5rem; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; border-top: 1px solid #f8fafc; background: rgba(255,255,255,0.5);">
+            <div class="action-chip" onclick="quickAsk('Hôm nay tôi có lịch học không?')">📅 Lịch học</div>
+            <div class="action-chip" onclick="quickAsk('Thống kê sinh viên theo khoa')">📊 Thống kê</div>
+            <div class="action-chip" onclick="quickAsk('Danh sách giảng viên CNTT')">👨‍🏫 Giảng viên</div>
+            <div class="action-chip" onclick="quickAsk('Ai là thủ khoa năm nay?')">🏆 Top SV</div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Gửi câu hỏi của bạn...">
-            <button id="chat-send" style="background: var(--brand-primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                <i data-lucide="send" style="width: 18px;"></i>
+            <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn...">
+            <button id="chat-send" style="background: var(--brand-primary); color: white; border: none; width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);">
+                <i data-lucide="send" style="width: 18px; stroke-width: 2.5px;"></i>
             </button>
         </div>
     </div>
@@ -642,16 +724,22 @@
             if (!messageOverride) chatInput.value = '';
 
             // User Message
-            const userMsg = document.createElement('div');
-            userMsg.className = 'msg user';
-            userMsg.textContent = val;
-            chatMsgs.appendChild(userMsg);
+            const userBox = document.createElement('div');
+            userBox.className = 'msg-wrapper user';
+            userBox.innerHTML = `
+                <div class="msg-info">Bạn • Vừa xong</div>
+                <div class="msg user">${val}</div>
+            `;
+            chatMsgs.appendChild(userBox);
             chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
             // Typing Indicator
             const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'msg bot typing';
-            typingIndicator.innerHTML = '<span class="typing-dots">Đang xử lý...</span>';
+            typingIndicator.className = 'msg-wrapper';
+            typingIndicator.innerHTML = `
+                <div class="msg-info">EduAgent AI • Đang trả lời...</div>
+                <div class="msg bot" style="font-style: italic; opacity: 0.7;">Đang xử lý...</div>
+            `;
             chatMsgs.appendChild(typingIndicator);
             chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
@@ -666,19 +754,22 @@
                 // Remove typing indicator
                 typingIndicator.remove();
 
-                const botMsg = document.createElement('div');
-                botMsg.className = 'msg bot';
+                const botBox = document.createElement('div');
+                botBox.className = 'msg-wrapper';
                 
                 // Simple bolding formatter for bot response
                 let reply = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 reply = reply.replace(/\n/g, '<br>');
                 
-                botMsg.innerHTML = reply;
-                chatMsgs.appendChild(botMsg);
+                botBox.innerHTML = `
+                    <div class="msg-info">EduAgent AI • Vừa xong</div>
+                    <div class="msg bot">${reply}</div>
+                `;
+                chatMsgs.appendChild(botBox);
                 chatMsgs.scrollTop = chatMsgs.scrollHeight;
             } catch(e) { 
                 console.error(e); 
-                typingIndicator.innerHTML = '⚠️ Có lỗi xảy ra, vui lòng thử lại.';
+                typingIndicator.innerHTML = '<div class="msg bot" style="color: #ef4444;">⚠️ Có lỗi xảy ra, vui lòng thử lại.</div>';
             }
         }
 
