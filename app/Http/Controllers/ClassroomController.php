@@ -100,6 +100,11 @@ class ClassroomController extends Controller
 
         $activeSemester = \App\Models\Semester::where('is_active', true)->first();
 
+        // Check if there is an active semester before proceeding
+        if (!$activeSemester) {
+            return redirect()->back()->with('error', '⚠️ Vui lòng kích hoạt một học kỳ trước khi ghi danh sinh viên vào môn học!');
+        }
+
         $allSchedules = \App\Models\Schedule::where('classroom_id', $schedule->classroom_id)
             ->where('subject_id', $schedule->subject_id)
             ->get();
@@ -109,7 +114,7 @@ class ClassroomController extends Controller
                 'student_id' => $validated['student_id'],
                 'schedule_id' => $s->id,
                 'subject_id' => $s->subject_id,
-                'semester_id' => $activeSemester ? $activeSemester->id : null,
+                'semester_id' => $activeSemester->id,
             ]);
         }
         
