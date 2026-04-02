@@ -78,6 +78,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/classrooms/{id}/subjects/{subject_id}/edit-configuration', [App\Http\Controllers\ClassroomController::class, 'editSubjectConfiguration'])->name('classrooms.edit_subject_configuration');
     Route::put('/classrooms/{id}/subjects/{subject_id}/update-configuration', [App\Http\Controllers\ClassroomController::class, 'updateSubjectConfiguration'])->name('classrooms.update_subject_configuration');
     Route::post('/schedules/{schedule_id}/enroll', [ClassroomController::class, 'enrollStudent'])->name('classrooms.enroll_student');
+    Route::get('/schedules/{schedule_id}/enroll', function() {
+        return redirect()->route('classrooms.index')->with('error', '⚠️ Bạn không thể truy cập trực tiếp link này. Hãy chọn sinh viên và nhấn nút "Ghi danh" từ bảng điều khiển.');
+    });
     Route::delete('/registrations/{registration_id}', [ClassroomController::class, 'unenrollStudent'])->name('classrooms.unenroll_student');
 
     Route::resource('students', StudentController::class);
